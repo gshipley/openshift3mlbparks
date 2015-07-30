@@ -65,11 +65,20 @@ public class DBConnection {
 				URL jsonFile = new URL("https://raw.githubusercontent.com/gshipley/openshift3mlbparks/master/mlbparks.json");
 				BufferedReader in = new BufferedReader(new InputStreamReader(jsonFile.openStream()));
 				StringBuffer teams = new StringBuffer();
+				DBObject currentTeam = null;
 				while((currentLine = in.readLine()) != null) {
-					teams.append(currentLine);
+					if(currentLine.equalsIgnoreCase("{}")) {
+						teams.append("}");
+						currentTeam = ((DBObject) JSON.parse(teams.toString()));
+						parkListCollection.insert(currentTeam);
+						teams = new StringBuffer(("{"));
+					} else {
+						teams.append(currentLine);
+					}
 				}
-				DBObject theTeams = ((DBObject) JSON.parse(teams.toString()));
-				parkListCollection.insert(theTeams);
+				teams.append("}");
+
+				parkListCollection.insert((DBObject) JSON.parse(teams.toString()));
 
 			} catch(Exception e) {
 				e.printStackTrace();
