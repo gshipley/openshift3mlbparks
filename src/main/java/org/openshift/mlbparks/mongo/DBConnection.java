@@ -7,6 +7,7 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Named;
 
 import com.mongodb.DB;
+import com.mongodb.DBCollection;
 import com.mongodb.Mongo;
 
 @Named
@@ -43,10 +44,19 @@ public class DBConnection {
 			System.out.println("Failed to authenticate DB ");
 		}
 
+		this.initDatabase(mongoDB);
+
 	}
 
 	public DB getDB() {
 		return mongoDB;
+	}
+
+	private void initDatabase(DB mongoDB) {
+		DBCollection parkListCollection = mongoDB.getCollection("teams");
+		if(parkListCollection.count() < 1) {
+			System.out.println("The database is empty.  We need to populate it");
+		}
 	}
 
 }
