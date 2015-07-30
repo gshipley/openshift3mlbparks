@@ -8,7 +8,10 @@ import javax.inject.Named;
 
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
+import com.mongodb.DBObject;
 import com.mongodb.Mongo;
+import jdk.nashorn.internal.parser.JSONParser;
+import jdk.nashorn.internal.runtime.JSONFunctions;
 
 @Named
 @ApplicationScoped
@@ -56,6 +59,7 @@ public class DBConnection {
 		DBCollection parkListCollection = mongoDB.getCollection("teams");
 		if(parkListCollection.count() < 1) {
 			System.out.println("The database is empty.  We need to populate it");
+			//URL url - new URL(http://)
 		}
 	}
 
