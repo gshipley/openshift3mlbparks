@@ -67,7 +67,7 @@ public class DBConnection {
 				StringBuffer teams = new StringBuffer();
 				DBObject currentTeam = null;
 				while((currentLine = in.readLine()) != null) {
-					if(currentLine.equalsIgnoreCase("{}")) {
+					if(currentLine.equalsIgnoreCase("}{")) {
 						teams.append("}");
 						currentTeam = ((DBObject) JSON.parse(teams.toString()));
 						parkListCollection.insert(currentTeam);
