@@ -1,5 +1,8 @@
 package org.openshift.mlbparks.mongo;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.URL;
 import java.net.UnknownHostException;
 
 import javax.annotation.PostConstruct;
@@ -59,7 +62,16 @@ public class DBConnection {
 		DBCollection parkListCollection = mongoDB.getCollection("teams");
 		if(parkListCollection.count() < 1) {
 			System.out.println("The database is empty.  We need to populate it");
-			//URL url - new URL(http://)
+			try {
+				URL jsonFile = new URL("https://raw.githubusercontent.com/gshipley/openshift3mlbparks/master/mlbparks.json");
+				BufferedReader in = new BufferedReader(new InputStreamReader(jsonFile.openStream()));
+				String currentLine;
+				while((currentLine = in.readLine()) != null) {
+					System.out.println(currentLine);
+				}
+			} catch(Exception e) {
+				e.printStackTrace();
+			}
 		}
 	}
 
