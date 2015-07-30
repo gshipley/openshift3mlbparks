@@ -9,10 +9,8 @@ import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Named;
 
-import com.mongodb.DB;
-import com.mongodb.DBCollection;
-import com.mongodb.DBObject;
-import com.mongodb.Mongo;
+import com.mongodb.*;
+import com.mongodb.util.JSON;
 import jdk.nashorn.internal.parser.JSONParser;
 import jdk.nashorn.internal.runtime.JSONFunctions;
 
@@ -63,12 +61,16 @@ public class DBConnection {
 		if(parkListCollection.count() < 1) {
 			System.out.println("The database is empty.  We need to populate it");
 			try {
+				String currentLine = "";
 				URL jsonFile = new URL("https://raw.githubusercontent.com/gshipley/openshift3mlbparks/master/mlbparks.json");
 				BufferedReader in = new BufferedReader(new InputStreamReader(jsonFile.openStream()));
-				String currentLine;
+				StringBuffer teams = new StringBuffer();
 				while((currentLine = in.readLine()) != null) {
-					System.out.println(currentLine);
+					teams.append(currentLine);
 				}
+				DBObject theTeams = ((DBObject) JSON.parse(teams.toString()));
+				parkListCollection.insert(theTeams);
+
 			} catch(Exception e) {
 				e.printStackTrace();
 			}
