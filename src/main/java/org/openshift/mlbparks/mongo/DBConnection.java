@@ -21,16 +21,17 @@ public class DBConnection {
 
 	@PostConstruct
 	public void afterCreate() {
-		String mongoHost = System.getenv("OPENSHIFT_MONGODB_DB_HOST");
-		String mongoPort = System.getenv("OPENSHIFT_MONGODB_DB_PORT");
-		String mongoUser = System.getenv("OPENSHIFT_MONGODB_DB_USERNAME");
-		String mongoPassword = System.getenv("OPENSHIFT_MONGODB_DB_PASSWORD");
-		String mongoDBName = System.getenv("OPENSHIFT_APP_NAME");
+		String mongoHost = System.getenv("MONGODB_SERVICE_HOST");
+		String mongoPort = System.getenv("MONGODB_PORT");
+		String mongoUser = System.getenv("MONGODB_USER");
+		String mongoPassword = System.getenv("MONGODB_PASSWORD");
+		String mongoDBName = System.getenv("MONGODB_DATABASE");
 		int port = Integer.decode(mongoPort);
 
 		Mongo mongo = null;
 		try {
 			mongo = new Mongo(mongoHost, port);
+			System.out.println("Connected to database");
 		} catch (UnknownHostException e) {
 			System.out.println("Couldn't connect to MongoDB: " + e.getMessage()
 					+ " :: " + e.getClass());
