@@ -25,7 +25,7 @@
       {
          "description": "Custom hostname for service routes.  Leave blank for default hostname, e.g.: <application-name>.<project>.<default-domain-suffix>",
          "name": "APPLICATION_HOSTNAME",
-         "value": "${APPLICATION_NAME}.mlbparks.cloudapps.test.openshift3roadshow.com"
+         "value": ""
       },
       {
          "description": "Git source URI for application",
