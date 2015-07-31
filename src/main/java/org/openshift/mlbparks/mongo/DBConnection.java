@@ -9,10 +9,11 @@ import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Named;
 
-import com.mongodb.*;
+import com.mongodb.DB;
+import com.mongodb.DBCollection;
+import com.mongodb.DBObject;
+import com.mongodb.Mongo;
 import com.mongodb.util.JSON;
-import jdk.nashorn.internal.parser.JSONParser;
-import jdk.nashorn.internal.runtime.JSONFunctions;
 
 @Named
 @ApplicationScoped
@@ -38,8 +39,7 @@ public class DBConnection {
 			mongo = new Mongo(mongoHost, port);
 			System.out.println("Connected to database");
 		} catch (UnknownHostException e) {
-			System.out.println("Couldn't connect to MongoDB: " + e.getMessage()
-					+ " :: " + e.getClass());
+			System.out.println("Couldn't connect to MongoDB: " + e.getMessage() + " :: " + e.getClass());
 		}
 
 		mongoDB = mongo.getDB(mongoDBName);
@@ -58,29 +58,21 @@ public class DBConnection {
 
 	private void initDatabase(DB mongoDB) {
 		DBCollection parkListCollection = mongoDB.getCollection("teams");
-		if(parkListCollection.count() < 1) {
+		int teamsImported = 0;
+		if (parkListCollection.count() < 1) {
 			System.out.println("The database is empty.  We need to populate it");
 			try {
-				String currentLine = "";
-				URL jsonFile = new URL("https://raw.githubusercontent.com/gshipley/openshift3mlbparks/master/mlbparks.json");
+				String currentLine = new String();
+				URL jsonFile = new URL(
+						"https://raw.githubusercontent.com/gshipley/openshift3mlbparks/master/mlbparks.json");
 				BufferedReader in = new BufferedReader(new InputStreamReader(jsonFile.openStream()));
-				StringBuffer teams = new StringBuffer();
-				DBObject currentTeam = null;
-				while((currentLine = in.readLine()) != null) {
-					if(currentLine.equalsIgnoreCase("}{")) {
-						teams.append("}");
-						currentTeam = ((DBObject) JSON.parse(teams.toString()));
-						parkListCollection.insert(currentTeam);
-						teams = new StringBuffer(("{"));
-					} else {
-						teams.append(currentLine);
-					}
+				while ((currentLine = in.readLine()) != null) {
+					parkListCollection.insert((DBObject) JSON.parse(currentLine.toString()));
+					teamsImported++;
 				}
-				teams.append("}");
+				System.out.println("Successfully imported " + teamsImported + " teams.");
 
-				parkListCollection.insert((DBObject) JSON.parse(teams.toString()));
-
-			} catch(Exception e) {
+			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		}
