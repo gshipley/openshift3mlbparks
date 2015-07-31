@@ -13,6 +13,6 @@ Load the template with cluster-admin user:
 Create a new app in you user`s project. Provide your own values
 
 ````
-$ oc new-app mlbparks -p APPLICATION_NAME=mlbparks,APPLICATION_HOSTNAME=mlbparks.cloudapps.example.com
+$ oc new-app mlbparks -p APPLICATION_NAME=mlbparks
 ````
 
