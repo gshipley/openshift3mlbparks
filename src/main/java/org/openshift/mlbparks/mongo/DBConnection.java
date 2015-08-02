@@ -34,6 +34,15 @@ public class DBConnection {
 		String mongoDBName = System.getenv("MONGODB_DATABASE");
 		int port = Integer.decode(mongoPort);
 
+		// Check if we are using a mongoDB template or mongodb RHEL 7 image
+
+		if (mongoHost == null) {
+			mongoHost = System.getenv("MONGODB_24_RHEL7_SERVICE_PORT");
+		}
+		if (mongoPort == null) {
+			mongoPort = System.getenv("MONGODB_24_RHEL7_SERVICE_PORT");
+		}
+
 		Mongo mongo = null;
 		try {
 			mongo = new Mongo(mongoHost, port);
