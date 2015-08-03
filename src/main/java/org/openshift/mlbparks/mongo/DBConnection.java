@@ -33,20 +33,13 @@ public class DBConnection {
 		String mongoPassword = System.getenv("MONGODB_PASSWORD");
 		String mongoDBName = System.getenv("MONGODB_DATABASE");
 		// Check if we are using a mongoDB template or mongodb RHEL 7 image
-
 		if (mongoHost == null) {
-			System.out.println("mongoHost not found");
 			mongoHost = System.getenv("MONGODB_24_RHEL7_SERVICE_HOST");
-		} else {
-			System.out.println("mongoHost found");
-		}
+		} 
 		if (mongoPort == null) {
-			System.out.println("mongoPort not found");
 			mongoPort = System.getenv("MONGODB_24_RHEL7_SERVICE_PORT");
-		} else {
-			System.out.println("mongoPort found");
 		}
-
+		
 		int port = Integer.decode(mongoPort);
 		
 		Mongo mongo = null;
