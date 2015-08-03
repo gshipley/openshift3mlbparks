@@ -36,7 +36,7 @@ public class DBConnection {
 
 		if (mongoHost == null) {
 			System.out.println("mongoHost not found");
-			mongoHost = System.getenv("MONGODB_24_RHEL7_SERVICE_PORT");
+			mongoHost = System.getenv("MONGODB_24_RHEL7_SERVICE_HOST");
 		} else {
 			System.out.println("mongoHost found");
 		}
