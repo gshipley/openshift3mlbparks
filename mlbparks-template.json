@@ -4,7 +4,7 @@
     "metadata": {
         "name": "mlbparks-template",
         "annotations": {
-            "description": "Application template for MLB Parks application on EAP 6 & MongoDB built using STI"
+            "description": "Application template for MLB Parks application on EAP 6 & MongoDB built using STI",
             "iconClass": "icon-jboss",
             "tags": "instant-app,eap,mongodb,javaee,java,database,jboss,xpaas",
         }
