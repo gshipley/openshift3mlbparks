@@ -1,631 +1,475 @@
 {
-  "kind": "Template",
-  "apiVersion": "v1",
-  "metadata": {
-    "name": "mlbparks-template",
-    "annotations": {
-      "description": "Application template for MLB Parks application on EAP 6 & MongoDB built using STI",
-      "iconClass": "icon-jboss",
-      "tags": "instant-app,eap,mongodb,javaee,java,database,jboss,xpaas"
-    }
-  },
-  "labels": {
-    "template": "mlbparks-template"
-  },
-  "objects": [
-    {
-      "kind": "Service",
-      "apiVersion": "v1",
-      "spec": {
-        "ports": [
-          {
-            "port": 8080,
-            "targetPort": 8080
-          }
-        ],
-        "selector": {
-          "deploymentConfig": "${APPLICATION_NAME}"
-        }
-      },
-      "metadata": {
-        "name": "${APPLICATION_NAME}",
-        "labels": {
-          "application": "${APPLICATION_NAME}"
-        },
+    "kind": "Template",
+    "apiVersion": "v1",
+    "metadata": {
+        "name": "mlbparks",
         "annotations": {
-          "description": "The web server's http port."
+            "description": "Application template for MLB Parks application on EAP 6 \u0026 MongoDB built using STI,",
+            "iconClass": "icon-jboss",
+            "tags": "eap,javaee,java,jboss,xpaas,mongodb,instant-app"
         }
-      }
     },
-    {
-      "kind": "Service",
-      "apiVersion": "v1",
-      "spec": {
-        "ports": [
-          {
-            "port": 8443,
-            "targetPort": 8443
-          }
-        ],
-        "selector": {
-          "deploymentConfig": "${APPLICATION_NAME}"
-        }
-      },
-      "metadata": {
-        "name": "secure-${APPLICATION_NAME}",
-        "labels": {
-          "application": "${APPLICATION_NAME}"
-        },
-        "annotations": {
-          "description": "The web server's https port."
-        }
-      }
-    },
-    {
-      "kind": "Service",
-      "apiVersion": "v1",
-      "spec": {
-        "ports": [
-          {
-            "port": 27017,
-            "targetPort": 27017
-          }
-        ],
-        "selector": {
-          "deploymentConfig": "${APPLICATION_NAME}-mongodb"
-        }
-      },
-      "metadata": {
-        "name": "${APPLICATION_NAME}-mongodb",
-        "labels": {
-          "application": "${APPLICATION_NAME}"
-        },
-        "annotations": {
-          "description": "The database server's port."
-        }
-      }
-    },
-    {
-      "kind": "Route",
-      "apiVersion": "v1",
-      "id": "${APPLICATION_NAME}-http",
-      "metadata": {
-        "name": "${APPLICATION_NAME}",
-        "labels": {
-          "application": "${APPLICATION_NAME}"
-        },
-        "annotations": {
-          "description": "Route for application's http service."
-        }
-      },
-      "spec": {
-        "host": "${APPLICATION_DOMAIN}",
-        "to": {
-          "name": "${APPLICATION_NAME}"
-        }
-      }
-    },
-    {
-      "kind": "Route",
-      "apiVersion": "v1",
-      "id": "${APPLICATION_NAME}-https",
-      "metadata": {
-        "name": "secure-${APPLICATION_NAME}",
-        "labels": {
-          "application": "${APPLICATION_NAME}"
-        },
-        "annotations": {
-          "description": "Route for application's https service."
-        }
-      },
-      "spec": {
-        "host": "${APPLICATION_DOMAIN}",
-        "to": {
-          "name": "secure-${APPLICATION_NAME}"
-        },
-        "tls": {
-          "termination": "passthrough"
-        }
-      }
-    },
-    {
-      "kind": "ImageStream",
-      "apiVersion": "v1",
-      "metadata": {
-        "name": "${APPLICATION_NAME}",
-        "labels": {
-          "application": "${APPLICATION_NAME}"
-        }
-      }
-    },
-    {
-      "kind": "BuildConfig",
-      "apiVersion": "v1",
-      "metadata": {
-        "name": "${APPLICATION_NAME}",
-        "labels": {
-          "application": "${APPLICATION_NAME}"
-        }
-      },
-      "spec": {
-        "source": {
-          "type": "Git",
-          "git": {
-            "uri": "${SOURCE_REPOSITORY_URL}",
-            "ref": "${SOURCE_REPOSITORY_REF}"
-          },
-          "contextDir": "${CONTEXT_DIR}"
-        },
-        "strategy": {
-          "type": "Source",
-          "sourceStrategy": {
-            "forcePull": true,
-            "from": {
-              "kind": "ImageStreamTag",
-              "namespace": "${IMAGE_STREAM_NAMESPACE}",
-              "name": "jboss-eap64-openshift:1.1"
-            }
-          }
-        },
-        "output": {
-          "to": {
-            "kind": "ImageStreamTag",
-            "name": "${APPLICATION_NAME}:latest"
-          }
-        },
-        "triggers": [
-          {
-            "type": "GitHub",
-            "github": {
-              "secret": "${GITHUB_WEBHOOK_SECRET}"
-            }
-          },
-          {
-            "type": "Generic",
-            "generic": {
-              "secret": "${GENERIC_WEBHOOK_SECRET}"
-            }
-          },
-          {
-            "type": "ImageChange",
-            "imageChange": {}
-          },
-          {
-            "type": "ConfigChange"
-          }
-        ]
-      }
-    },
-    {
-      "kind": "DeploymentConfig",
-      "apiVersion": "v1",
-      "metadata": {
-        "name": "${APPLICATION_NAME}",
-        "labels": {
-          "application": "${APPLICATION_NAME}"
-        }
-      },
-      "spec": {
-        "strategy": {
-          "type": "Recreate"
-        },
-        "triggers": [
-          {
-            "type": "ImageChange",
-            "imageChangeParams": {
-              "automatic": true,
-              "containerNames": [
-                "${APPLICATION_NAME}"
-              ],
-              "from": {
-                "kind": "ImageStream",
-                "name": "${APPLICATION_NAME}"
-              }
-            }
-          },
-          {
-            "type": "ConfigChange"
-          }
-        ],
-        "replicas": 1,
-        "selector": {
-          "deploymentConfig": "${APPLICATION_NAME}"
-        },
-        "template": {
-          "metadata": {
-            "name": "${APPLICATION_NAME}",
-            "labels": {
-              "deploymentConfig": "${APPLICATION_NAME}",
-              "application": "${APPLICATION_NAME}"
-            }
-          },
-          "spec": {
-            "serviceAccount": "eap-service-account",
-            "terminationGracePeriodSeconds": 60,
-            "containers": [
-              {
-                "name": "${APPLICATION_NAME}",
-                "image": "${APPLICATION_NAME}",
-                "imagePullPolicy": "Always",
-                "volumeMounts": [
-                  {
-                    "name": "eap-keystore-volume",
-                    "mountPath": "/etc/eap-secret-volume",
-                    "readOnly": true
-                  }
-                ],
-                "readinessProbe": {
-                  "exec": {
-                    "command": [
-                      "/bin/bash",
-                      "-c",
-                      "/opt/eap/bin/readinessProbe.sh"
-                    ]
-                  }
-                },
-                "ports": [
-                  {
-                    "name": "http",
-                    "containerPort": 8080,
-                    "protocol": "TCP"
-                  },
-                  {
-                    "name": "https",
-                    "containerPort": 8443,
-                    "protocol": "TCP"
-                  },
-                  {
-                    "name": "ping",
-                    "containerPort": 8888,
-                    "protocol": "TCP"
-                  }
-                ],
-                "env": [
-                  {
-                    "name": "DB_SERVICE_PREFIX_MAPPING",
-                    "value": "${APPLICATION_NAME}-mongodb=DB"
-                  },
-                  {
-                    "name": "DB_JNDI",
-                    "value": "${DB_JNDI}"
-                  },
-                  {
-                    "name": "DB_USERNAME",
-                    "value": "${DB_USERNAME}"
-                  },
-                  {
-                    "name": "DB_PASSWORD",
-                    "value": "${DB_PASSWORD}"
-                  },
-                  {
-                    "name": "DB_DATABASE",
-                    "value": "${DB_DATABASE}"
-                  },
-                  {
-                    "name": "DB_ADMIN_PASSWORD",
-                    "value": "${DB_ADMIN_PASSWORD}"
-                  },
-                  {
-                    "name": "DB_MIN_POOL_SIZE",
-                    "value": "${DB_MIN_POOL_SIZE}"
-                  },
-                  {
-                    "name": "DB_MAX_POOL_SIZE",
-                    "value": "${DB_MAX_POOL_SIZE}"
-                  },
-                  {
-                    "name": "DB_TX_ISOLATION",
-                    "value": "${DB_TX_ISOLATION}"
-                  },
-                  {
-                    "name": "OPENSHIFT_KUBE_PING_LABELS",
-                    "value": "application=${APPLICATION_NAME}"
-                  },
-                  {
-                    "name": "OPENSHIFT_KUBE_PING_NAMESPACE",
-                    "valueFrom": {
-                      "fieldRef": {
-                        "fieldPath": "metadata.namespace"
-                      }
-                    }
-                  },
-                  {
-                    "name": "EAP_HTTPS_KEYSTORE_DIR",
-                    "value": "/etc/eap-secret-volume"
-                  },
-                  {
-                    "name": "EAP_HTTPS_KEYSTORE",
-                    "value": "${EAP_HTTPS_KEYSTORE}"
-                  },
-                  {
-                    "name": "EAP_HTTPS_NAME",
-                    "value": "${EAP_HTTPS_NAME}"
-                  },
-                  {
-                    "name": "EAP_HTTPS_PASSWORD",
-                    "value": "${EAP_HTTPS_PASSWORD}"
-                  },
-                  {
-                    "name": "HORNETQ_CLUSTER_PASSWORD",
-                    "value": "${HORNETQ_CLUSTER_PASSWORD}"
-                  },
-                  {
-                    "name": "HORNETQ_QUEUES",
-                    "value": "${HORNETQ_QUEUES}"
-                  },
-                  {
-                    "name": "HORNETQ_TOPICS",
-                    "value": "${HORNETQ_TOPICS}"
-                  }
-                ]
-              }
-            ],
-            "volumes": [
-              {
-                "name": "eap-keystore-volume",
-                "secret": {
-                  "secretName": "${EAP_HTTPS_SECRET}"
-                }
-              }
-            ]
-          }
-        }
-      }
-    },
-    {
-      "kind": "DeploymentConfig",
-      "apiVersion": "v1",
-      "metadata": {
-        "name": "${APPLICATION_NAME}-mongodb",
-        "labels": {
-          "application": "${APPLICATION_NAME}"
-        }
-      },
-      "spec": {
-        "strategy": {
-          "type": "Recreate"
-        },
-        "triggers": [
-          {
-            "type": "ImageChange",
-            "imageChangeParams": {
-              "automatic": true,
-              "containerNames": [
-                "${APPLICATION_NAME}-mongodb"
-              ],
-              "from": {
-                "kind": "ImageStreamTag",
-                "namespace": "${IMAGE_STREAM_NAMESPACE}",
-                "name": "mongodb:latest"
-              }
-            }
-          },
-          {
-            "type": "ConfigChange"
-          }
-        ],
-        "replicas": 1,
-        "selector": {
-          "deploymentConfig": "${APPLICATION_NAME}-mongodb"
-        },
-        "template": {
-          "metadata": {
-            "name": "${APPLICATION_NAME}-mongodb",
-            "labels": {
-              "deploymentConfig": "${APPLICATION_NAME}-mongodb",
-              "application": "${APPLICATION_NAME}"
-            }
-          },
-          "spec": {
-            "terminationGracePeriodSeconds": 60,
-            "containers": [
-              {
-                "name": "${APPLICATION_NAME}-mongodb",
-                "image": "mongodb",
-                "imagePullPolicy": "Always",
-                "ports": [
-                  {
-                    "containerPort": 27017,
-                    "protocol": "TCP"
-                  }
-                ],
-                "env": [
-                  {
-                    "name": "MONGODB_USER",
-                    "value": "${DB_USERNAME}"
-                  },
-                  {
-                    "name": "MONGODB_PASSWORD",
-                    "value": "${DB_PASSWORD}"
-                  },
-                  {
-                    "name": "MONGODB_DATABASE",
-                    "value": "${DB_DATABASE}"
-                  },
-                  {
-                    "name": "MONGODB_ADMIN_PASSWORD",
-                    "value": "${DB_ADMIN_PASSWORD}"
-                  },
-                  {
-                    "name": "MONGODB_NOPREALLOC",
-                    "value": "${MONGODB_NOPREALLOC}"
-                  },
-                  {
-                    "name": "MONGODB_SMALLFILES",
-                    "value": "${MONGODB_SMALLFILES}"
-                  },
-                  {
-                    "name": "MONGODB_QUIET",
-                    "value": "${MONGODB_QUIET}"
-                  }
-                ]
-              }
-            ]
-          }
-        }
-      }
-    },
-    {
-      "kind": "ServiceAccount",
-      "apiVersion": "v1",
-      "metadata": {
-        "name": "eap-service-account"
-      },
-      "secrets": [
+    "objects": [
         {
-          "name": "eap-app-secret"
-        }
-      ]
-    },
-    {
-      "kind": "Secret",
-      "apiVersion": "v1",
-      "metadata": {
-        "annotations": {
-          "description": "Default HTTPS keystore (keystore.jks) with name 'jboss' and password 'mykeystorepass' and JGoups keystore (jgroups.jceks) with name 'secret-key' and password 'password'"
+            "kind": "Service",
+            "apiVersion": "v1",
+            "spec": {
+                "ports": [
+                    {
+                        "port": 8080,
+                        "targetPort": 8080
+                    }
+                ],
+                "selector": {
+                    "deploymentConfig": "${APPLICATION_NAME}"
+                }
+            },
+            "metadata": {
+                "name": "${APPLICATION_NAME}",
+                "labels": {
+                    "application": "${APPLICATION_NAME}"
+                },
+                "annotations": {
+                    "description": "The web server's http port."
+                }
+            }
         },
-        "name": "eap-app-secret"
-      },
-      "data": {
-        "keystore.jks": "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",
-        "jgroups.jceks": "zs7OzgAAAAIAAAABAAAAAwAKc2VjcmV0LWtleQAAAVDQhuHmrO0ABXNyADNjb20uc3VuLmNyeXB0by5wcm92aWRlci5TZWFsZWRPYmplY3RGb3JLZXlQcm90ZWN0b3LNV8pZ5zC7UwIAAHhyABlqYXZheC5jcnlwdG8uU2VhbGVkT2JqZWN0PjY9psO3VHACAARbAA1lbmNvZGVkUGFyYW1zdAACW0JbABBlbmNyeXB0ZWRDb250ZW50cQB+AAJMAAlwYXJhbXNBbGd0ABJMamF2YS9sYW5nL1N0cmluZztMAAdzZWFsQWxncQB+AAN4cHVyAAJbQqzzF/gGCFTgAgAAeHAAAAAPMA0ECHcwLGK6EDyLAgEUdXEAfgAFAAAAmCu9wRKf1aYYUOEWe406ncPtIdm3147G7MJyWUu2kJVY15a2QxeZi9w5J3AF6T64CvylUuQjpcC4DWXwVn9BefntkBR8CzTiH7VxEqVOQ/OkFS29Inoq8t7/NBaTgTdmMkb4ETV1gIsy/+W6kk7QTqxItCkdKKGFE90Be/7yL3tG16TCy/ABKl7CO6PHa44CqK2PUE1oaJ+WdAAWUEJFV2l0aE1ENUFuZFRyaXBsZURFU3QAFlBCRVdpdGhNRDVBbmRUcmlwbGVERVMN658veJP01V2j9y8bQCYIzViutw=="
-      }
+        {
+            "kind": "Route",
+            "apiVersion": "v1",
+            "id": "${APPLICATION_NAME}-http",
+            "metadata": {
+                "name": "${APPLICATION_NAME}",
+                "labels": {
+                    "application": "${APPLICATION_NAME}"
+                },
+                "annotations": {
+                    "description": "Route for application's http service."
+                }
+            },
+            "spec": {
+                "host": "${APPLICATION_DOMAIN}",
+                "to": {
+                    "name": "${APPLICATION_NAME}"
+                }
+            }
+        },
+        {
+            "kind": "ImageStream",
+            "apiVersion": "v1",
+            "metadata": {
+                "name": "${APPLICATION_NAME}",
+                "labels": {
+                    "application": "${APPLICATION_NAME}"
+                }
+            }
+        },
+        {
+            "kind": "BuildConfig",
+            "apiVersion": "v1",
+            "metadata": {
+                "name": "${APPLICATION_NAME}",
+                "labels": {
+                    "application": "${APPLICATION_NAME}"
+                }
+            },
+            "spec": {
+                "source": {
+                    "type": "Git",
+                    "git": {
+                        "uri": "${SOURCE_REPOSITORY_URL}",
+                        "ref": "${SOURCE_REPOSITORY_REF}"
+                    },
+                    "contextDir": "${CONTEXT_DIR}"
+                },
+                "strategy": {
+                    "type": "Source",
+                    "sourceStrategy": {
+                        "forcePull": true,
+                        "from": {
+                            "kind": "ImageStreamTag",
+                            "namespace": "${IMAGE_STREAM_NAMESPACE}",
+                            "name": "jboss-eap64-openshift:1.1"
+                        }
+                    }
+                },
+                "output": {
+                    "to": {
+                        "kind": "ImageStreamTag",
+                        "name": "${APPLICATION_NAME}:latest"
+                    }
+                },
+                "triggers": [
+                    {
+                        "type": "GitHub",
+                        "github": {
+                            "secret": "${GITHUB_WEBHOOK_SECRET}"
+                        }
+                    },
+                    {
+                        "type": "Generic",
+                        "generic": {
+                            "secret": "${GENERIC_WEBHOOK_SECRET}"
+                        }
+                    },
+                    {
+                        "type": "ImageChange",
+                        "imageChange": {}
+                    },
+                    {
+                        "type": "ConfigChange"
+                    }
+                ]
+            }
+        },
+        {
+            "kind": "DeploymentConfig",
+            "apiVersion": "v1",
+            "metadata": {
+                "name": "${APPLICATION_NAME}",
+                "labels": {
+                    "application": "${APPLICATION_NAME}"
+                }
+            },
+            "spec": {
+                "strategy": {
+                    "type": "Recreate"
+                },
+                "triggers": [
+                    {
+                        "type": "ImageChange",
+                        "imageChangeParams": {
+                            "automatic": true,
+                            "containerNames": [
+                                "${APPLICATION_NAME}"
+                            ],
+                            "from": {
+                                "kind": "ImageStream",
+                                "name": "${APPLICATION_NAME}"
+                            }
+                        }
+                    },
+                    {
+                        "type": "ConfigChange"
+                    }
+                ],
+                "replicas": 1,
+                "selector": {
+                    "deploymentConfig": "${APPLICATION_NAME}"
+                },
+                "template": {
+                    "metadata": {
+                        "name": "${APPLICATION_NAME}",
+                        "labels": {
+                            "deploymentConfig": "${APPLICATION_NAME}",
+                            "application": "${APPLICATION_NAME}"
+                        }
+                    },
+                    "spec": {
+                        "terminationGracePeriodSeconds": 60,
+                        "containers": [
+                            {
+                                "name": "${APPLICATION_NAME}",
+                                "image": "${APPLICATION_NAME}",
+                                "imagePullPolicy": "Always",
+                                "readinessProbe": {
+                                    "exec": {
+                                        "command": [
+                                            "/bin/bash",
+                                            "-c",
+                                            "/opt/eap/bin/readinessProbe.sh"
+                                        ]
+                                    }
+                                },
+                                "ports": [
+                                    {
+                                        "name": "http",
+                                        "containerPort": 8080,
+                                        "protocol": "TCP"
+                                    },
+                                    {
+                                        "name": "ping",
+                                        "containerPort": 8888,
+                                        "protocol": "TCP"
+                                    }
+                                ],
+                                "env": [
+                                    {
+                                        "name": "OPENSHIFT_KUBE_PING_LABELS",
+                                        "value": "application=${APPLICATION_NAME}"
+                                    },
+                                    {
+                                        "name": "OPENSHIFT_KUBE_PING_NAMESPACE",
+                                        "valueFrom": {
+                                            "fieldRef": {
+                                                "fieldPath": "metadata.namespace"
+                                            }
+                                        }
+                                    },
+                                    {
+                                        "name": "HORNETQ_CLUSTER_PASSWORD",
+                                        "value": "${HORNETQ_CLUSTER_PASSWORD}"
+                                    },
+                                    {
+                                        "name": "HORNETQ_QUEUES",
+                                        "value": "${HORNETQ_QUEUES}"
+                                    },
+                                    {
+                                        "name": "HORNETQ_TOPICS",
+                                        "value": "${HORNETQ_TOPICS}"
+                                    },
+                                    {
+                                        "name": "MONGODB_USER",
+                                        "value": "${MONGODB_USER}"
+                                    },
+                                    {
+                                        "name": "MONGODB_PASSWORD",
+                                        "value": "${MONGODB_PASSWORD}"
+                                    },
+                                    {
+                                        "name": "MONGODB_DATABASE",
+                                        "value": "${MONGODB_DATABASE}"
+                                    },
+                                    {
+                                        "name": "MONGODB_ADMIN_PASSWORD",
+                                        "value": "${MONGODB_ADMIN_PASSWORD}"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "kind": "Service",
+            "apiVersion": "v1",
+            "metadata": {
+                "name": "${DATABASE_SERVICE_NAME}",
+                "creationTimestamp": null
+            },
+            "spec": {
+                "ports": [
+                    {
+                        "name": "mongo",
+                        "protocol": "TCP",
+                        "port": 27017,
+                        "targetPort": 27017,
+                        "nodePort": 0
+                    }
+                ],
+                "selector": {
+                    "name": "${DATABASE_SERVICE_NAME}"
+                },
+                "portalIP": "",
+                "type": "ClusterIP",
+                "sessionAffinity": "None"
+            },
+            "status": {
+                "loadBalancer": {}
+            }
+        },
+        {
+            "kind": "DeploymentConfig",
+            "apiVersion": "v1",
+            "metadata": {
+                "name": "${DATABASE_SERVICE_NAME}",
+                "creationTimestamp": null
+            },
+            "spec": {
+                "strategy": {
+                    "type": "Recreate",
+                    "resources": {}
+                },
+                "triggers": [
+                    {
+                        "type": "ImageChange",
+                        "imageChangeParams": {
+                            "automatic": true,
+                            "containerNames": [
+                                "mongodb"
+                            ],
+                            "from": {
+                                "kind": "ImageStreamTag",
+                                "name": "mongodb:latest",
+                                "namespace": "openshift"
+                            },
+                            "lastTriggeredImage": ""
+                        }
+                    },
+                    {
+                        "type": "ConfigChange"
+                    }
+                ],
+                "replicas": 1,
+                "selector": {
+                    "name": "${DATABASE_SERVICE_NAME}"
+                },
+                "template": {
+                    "metadata": {
+                        "creationTimestamp": null,
+                        "labels": {
+                            "name": "${DATABASE_SERVICE_NAME}"
+                        }
+                    },
+                    "spec": {
+                        "containers": [
+                            {
+                                "name": "mongodb",
+                                "image": "mongodb",
+                                "ports": [
+                                    {
+                                        "containerPort": 27017,
+                                        "protocol": "TCP"
+                                    }
+                                ],
+                                "env": [
+                                    {
+                                        "name": "MONGODB_USER",
+                                        "value": "${MONGODB_USER}"
+                                    },
+                                    {
+                                        "name": "MONGODB_PASSWORD",
+                                        "value": "${MONGODB_PASSWORD}"
+                                    },
+                                    {
+                                        "name": "MONGODB_DATABASE",
+                                        "value": "${MONGODB_DATABASE}"
+                                    },
+                                    {
+                                        "name": "MONGODB_ADMIN_PASSWORD",
+                                        "value": "${MONGODB_ADMIN_PASSWORD}"
+                                    }
+                                ],
+                                "resources": {},
+                                "volumeMounts": [
+                                    {
+                                        "name": "${DATABASE_SERVICE_NAME}-data",
+                                        "mountPath": "/var/lib/mongodb/data"
+                                    }
+                                ],
+                                "terminationMessagePath": "/dev/termination-log",
+                                "imagePullPolicy": "IfNotPresent",
+                                "capabilities": {},
+                                "securityContext": {
+                                    "capabilities": {},
+                                    "privileged": false
+                                }
+                            }
+                        ],
+                        "volumes": [
+                            {
+                                "name": "${DATABASE_SERVICE_NAME}-data",
+                                "emptyDir": {
+                                    "medium": ""
+                                }
+                            }
+                        ],
+                        "restartPolicy": "Always",
+                        "dnsPolicy": "ClusterFirst"
+                    }
+                }
+            },
+            "status": {}
+        }
+    ],
+    "parameters": [
+        {
+            "name": "APPLICATION_NAME",
+            "description": "The name for the application.",
+            "value": "mlbparks",
+            "required": true
+        },
+        {
+            "name": "APPLICATION_DOMAIN",
+            "description": "Custom hostname for service routes.  Leave blank for default hostname, e.g.: \u003capplication-name\u003e.\u003cproject\u003e.\u003cdefault-domain-suffix\u003e"
+        },
+        {
+            "name": "SOURCE_REPOSITORY_URL",
+            "description": "Git source URI for application",
+            "value": "https://github.com/gshipley/openshift3mlbparks",
+            "required": true
+        },
+        {
+            "name": "SOURCE_REPOSITORY_REF",
+            "description": "Git branch/tag reference",
+            "value": "master"
+        },
+        {
+            "name": "CONTEXT_DIR",
+            "description": "Path within Git project to build; empty for root project directory."
+        },
+        {
+            "name": "HORNETQ_QUEUES",
+            "description": "Queue names"
+        },
+        {
+            "name": "HORNETQ_TOPICS",
+            "description": "Topic names"
+        },
+        {
+            "name": "HORNETQ_CLUSTER_PASSWORD",
+            "description": "HornetQ cluster admin password",
+            "generate": "expression",
+            "from": "[a-zA-Z0-9]{8}",
+            "required": true
+        },
+        {
+            "name": "GITHUB_WEBHOOK_SECRET",
+            "description": "GitHub trigger secret",
+            "generate": "expression",
+            "from": "[a-zA-Z0-9]{8}",
+            "required": true
+        },
+        {
+            "name": "GENERIC_WEBHOOK_SECRET",
+            "description": "Generic build trigger secret",
+            "generate": "expression",
+            "from": "[a-zA-Z0-9]{8}",
+            "required": true
+        },
+        {
+            "name": "IMAGE_STREAM_NAMESPACE",
+            "description": "Namespace in which the ImageStreams for Red Hat Middleware images are installed. These ImageStreams are normally installed in the openshift namespace. You should only need to modify this if you've installed the ImageStreams in a different namespace/project.",
+            "value": "openshift",
+            "required": true
+        },
+        {
+            "name": "DATABASE_SERVICE_NAME",
+            "description": "Database service name",
+            "value": "mongodb",
+            "required": true
+        },
+        {
+            "name": "MONGODB_USER",
+            "description": "Username for MongoDB user that will be used for accessing the database",
+            "generate": "expression",
+            "from": "user[A-Z0-9]{3}",
+            "required": true
+        },
+        {
+            "name": "MONGODB_PASSWORD",
+            "description": "Password for the MongoDB user",
+            "generate": "expression",
+            "from": "[a-zA-Z0-9]{16}",
+            "required": true
+        },
+        {
+            "name": "MONGODB_DATABASE",
+            "description": "Database name",
+            "value": "sampledb",
+            "required": true
+        },
+        {
+            "name": "MONGODB_ADMIN_PASSWORD",
+            "description": "Password for the database admin user",
+            "generate": "expression",
+            "from": "[a-zA-Z0-9]{16}",
+            "required": true
+        }
+    ],
+    "labels": {
+        "template": "eap64-basic-s2i",
+        "xpaas": "1.1.0"
     }
-  ],
-  "parameters": [
-    {
-      "name": "APPLICATION_NAME",
-      "description": "The name for the application.",
-      "value": "mlbparks",
-      "required": true
-    },
-    {
-      "name": "APPLICATION_DOMAIN",
-      "description": "Custom hostname for service routes.  Leave blank for default hostname, e.g.: <application-name>.<project>.<default-domain-suffix>"
-    },
-    {
-      "name": "SOURCE_REPOSITORY_URL",
-      "description": "Git source URI for application",
-      "value": "https://github.com/gshipley/openshift3mlbparks.git",
-      "required": true
-    },
-    {
-      "name": "SOURCE_REPOSITORY_REF",
-      "description": "Git branch/tag reference",
-      "value": "master"
-    },
-    {
-      "name": "CONTEXT_DIR",
-      "description": "Path within Git project to build; empty for root project directory.",
-      "value": ""
-    },
-    {
-      "name": "DB_JNDI",
-      "description": "Database JNDI name used by application to resolve the datasource, e.g. java:/jboss/datasources/mongodb"
-    },
-    {
-      "name": "DB_DATABASE",
-      "description": "Database name",
-      "value": "root",
-      "required": true
-    },
-    {
-      "name": "HORNETQ_QUEUES",
-      "description": "Queue names"
-    },
-    {
-      "name": "HORNETQ_TOPICS",
-      "description": "Topic names"
-    },
-    {
-      "name": "EAP_HTTPS_SECRET",
-      "description": "The name of the secret containing the keystore file",
-      "value": "eap-app-secret"
-    },
-    {
-      "name": "EAP_HTTPS_KEYSTORE",
-      "description": "The name of the keystore file within the secret",
-      "value": "keystore.jks"
-    },
-    {
-      "name": "EAP_HTTPS_NAME",
-      "description": "The name associated with the server certificate"
-    },
-    {
-      "name": "EAP_HTTPS_PASSWORD",
-      "description": "The password for the keystore and certificate"
-    },
-    {
-      "name": "DB_MIN_POOL_SIZE",
-      "description": "Sets xa-pool/min-pool-size for the configured datasource."
-    },
-    {
-      "name": "DB_MAX_POOL_SIZE",
-      "description": "Sets xa-pool/max-pool-size for the configured datasource."
-    },
-    {
-      "name": "DB_TX_ISOLATION",
-      "description": "Sets transaction-isolation for the configured datasource."
-    },
-    {
-      "name": "MONGODB_NOPREALLOC",
-      "description": "Disable data file preallocation."
-    },
-    {
-      "name": "MONGODB_SMALLFILES",
-      "description": "Set MongoDB to use a smaller default data file size."
-    },
-    {
-      "name": "MONGODB_QUIET",
-      "description": "Runs MongoDB in a quiet mode that attempts to limit the amount of output."
-    },
-    {
-      "name": "HORNETQ_CLUSTER_PASSWORD",
-      "description": "HornetQ cluster admin password",
-      "generate": "expression",
-      "from": "[a-zA-Z0-9]{8}",
-      "required": true
-    },
-    {
-      "name": "DB_USERNAME",
-      "description": "Database user name",
-      "generate": "expression",
-      "from": "user[a-zA-Z0-9]{3}",
-      "required": true
-    },
-    {
-      "name": "DB_PASSWORD",
-      "description": "Database user password",
-      "generate": "expression",
-      "from": "[a-zA-Z0-9]{8}",
-      "required": true
-    },
-    {
-      "name": "DB_ADMIN_PASSWORD",
-      "description": "Database admin password",
-      "generate": "expression",
-      "from": "[a-zA-Z0-9]{8}",
-      "required": true
-    },
-    {
-      "name": "GITHUB_WEBHOOK_SECRET",
-      "description": "GitHub trigger secret",
-      "generate": "expression",
-      "from": "[a-zA-Z0-9]{8}",
-      "required": true
-    },
-    {
-      "name": "GENERIC_WEBHOOK_SECRET",
-      "description": "Generic build trigger secret",
-      "generate": "expression",
-      "from": "[a-zA-Z0-9]{8}",
-      "required": true
-    },
-    {
-      "name": "IMAGE_STREAM_NAMESPACE",
-      "description": "Namespace in which the ImageStreams for Red Hat Middleware images are installed. These ImageStreams are normally installed in the openshift namespace. You should only need to modify this if you've installed the ImageStreams in a different namespace/project.",
-      "value": "openshift",
-      "required": true
-    }
-  ]
 }
