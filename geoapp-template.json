@@ -2,9 +2,9 @@
     "kind": "Template",
     "apiVersion": "v1",
     "metadata": {
-        "name": "mlbparks",
+        "name": "geoapp",
         "annotations": {
-            "description": "Application template for MLB Parks application on EAP 6 \u0026 MongoDB built using STI,",
+            "description": "Application template for GeoApp application on EAP 6 \u0026 MongoDB built using STI,",
             "iconClass": "icon-jboss",
             "tags": "eap,javaee,java,jboss,xpaas,mongodb,instant-app"
         }
@@ -89,7 +89,7 @@
                         "from": {
                             "kind": "ImageStreamTag",
                             "namespace": "${IMAGE_STREAM_NAMESPACE}",
-                            "name": "jboss-eap64-openshift:1.1"
+                            "name": "jboss-eap64-openshift:1.2"
                         }
                     }
                 },
@@ -219,20 +219,20 @@
                                         "value": "${HORNETQ_TOPICS}"
                                     },
                                     {
-                                        "name": "MONGODB_USER",
-                                        "value": "${MONGODB_USER}"
+                                        "name": "DB_USERNAME",
+                                        "value": "${DB_USERNAME}"
                                     },
                                     {
-                                        "name": "MONGODB_PASSWORD",
-                                        "value": "${MONGODB_PASSWORD}"
+                                        "name": "DB_PASSWORD",
+                                        "value": "${DB_PASSWORD}"
                                     },
                                     {
-                                        "name": "MONGODB_DATABASE",
-                                        "value": "${MONGODB_DATABASE}"
+                                        "name": "DB_DATABASE",
+                                        "value": "${DB_DATABASE}"
                                     },
                                     {
-                                        "name": "MONGODB_ADMIN_PASSWORD",
-                                        "value": "${MONGODB_ADMIN_PASSWORD}"
+                                        "name": "DB_ADMIN_PASSWORD",
+                                        "value": "${DB_ADMIN_PASSWORD}"
                                     }
                                 ]
                             }
@@ -326,19 +326,19 @@
                                 "env": [
                                     {
                                         "name": "MONGODB_USER",
-                                        "value": "${MONGODB_USER}"
+                                        "value": "${DB_USERNAME}"
                                     },
                                     {
                                         "name": "MONGODB_PASSWORD",
-                                        "value": "${MONGODB_PASSWORD}"
+                                        "value": "${DB_PASSWORD}"
                                     },
                                     {
                                         "name": "MONGODB_DATABASE",
-                                        "value": "${MONGODB_DATABASE}"
+                                        "value": "${DB_DATABASE}"
                                     },
                                     {
                                         "name": "MONGODB_ADMIN_PASSWORD",
-                                        "value": "${MONGODB_ADMIN_PASSWORD}"
+                                        "value": "${DB_ADMIN_PASSWORD}"
                                     }
                                 ],
                                 "resources": {},
@@ -377,7 +377,7 @@
         {
             "name": "APPLICATION_NAME",
             "description": "The name for the application.",
-            "value": "mlbparks",
+            "value": "geoapp",
             "required": true
         },
         {
@@ -387,7 +387,7 @@
         {
             "name": "SOURCE_REPOSITORY_URL",
             "description": "Git source URI for application",
-            "value": "https://github.com/gshipley/openshift3mlbparks",
+            "value": "https://github.com/siamaksade/openshift3geoapp.git",
             "required": true
         },
         {
@@ -441,27 +441,27 @@
             "required": true
         },
         {
-            "name": "MONGODB_USER",
+            "name": "DB_USERNAME",
             "description": "Username for MongoDB user that will be used for accessing the database",
             "generate": "expression",
             "from": "user[A-Z0-9]{3}",
             "required": true
         },
         {
-            "name": "MONGODB_PASSWORD",
+            "name": "DB_PASSWORD",
             "description": "Password for the MongoDB user",
             "generate": "expression",
             "from": "[a-zA-Z0-9]{16}",
             "required": true
         },
         {
-            "name": "MONGODB_DATABASE",
+            "name": "DB_DATABASE",
             "description": "Database name",
             "value": "sampledb",
             "required": true
         },
         {
-            "name": "MONGODB_ADMIN_PASSWORD",
+            "name": "DB_ADMIN_PASSWORD",
             "description": "Password for the database admin user",
             "generate": "expression",
             "from": "[a-zA-Z0-9]{16}",
@@ -470,6 +470,6 @@
     ],
     "labels": {
         "template": "eap64-basic-s2i",
-        "xpaas": "1.1.0"
+        "xpaas": "1.2.0"
     }
 }

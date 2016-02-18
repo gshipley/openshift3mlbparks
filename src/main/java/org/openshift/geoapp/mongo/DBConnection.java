@@ -35,11 +35,21 @@ public class DBConnection {
 
 	@PostConstruct
 	public void afterCreate() {
-		String mongoHost = (System.getenv("MONGODB_SERVICE_HOST") == null) ? "127.0.0.1" : System.getenv("MONGODB_SERVICE_HOST");
-		String mongoPort = (System.getenv("MONGODB_SERVICE_PORT") == null) ? "27017" : System.getenv("MONGODB_SERVICE_PORT"); 
-		String mongoUser = (System.getenv("MONGODB_USER")== null) ? "mlbparks" : System.getenv("MONGODB_USER");
-		String mongoPassword = (System.getenv("MONGODB_PASSWORD") == null) ? "mlbparks" : System.getenv("MONGODB_PASSWORD");
-		String mongoDBName = (System.getenv("MONGODB_DATABASE") == null) ? "mlbparks" : System.getenv("MONGODB_DATABASE");
+		String prefix = getApplicaitonName();
+		String mongoHost = (System.getenv(prefix + "MONGODB_SERVICE_HOST") == null) ? "127.0.0.1" : System.getenv(prefix + "MONGODB_SERVICE_HOST");
+		String mongoPort = (System.getenv(prefix + "MONGODB_SERVICE_PORT") == null) ? "27017" : System.getenv(prefix + "MONGODB_SERVICE_PORT"); 
+		String mongoUser = (System.getenv("DB_USERNAME")== null) ? "geoapp" : System.getenv("DB_USERNAME");
+		String mongoPassword = (System.getenv("DB_PASSWORD") == null) ? "geoapp" : System.getenv("DB_PASSWORD");
+		String mongoDBName = (System.getenv("DB_DATABASE") == null) ? "geoapp" : System.getenv("DB_DATABASE");
+		
+		// Check if mongodb is created separately
+		if (mongoHost == null) {
+			mongoHost = System.getenv("MONGODB_SERVICE_HOST");
+		} 
+		if (mongoPort == null) {
+			mongoPort = System.getenv("MONGODB_SERVICE_PORT");
+		}
+		
 		// Check if we are using a mongoDB template or mongodb RHEL 7 image
 		if (mongoHost == null) {
 			mongoHost = System.getenv("MONGODB_24_RHEL7_SERVICE_HOST");
@@ -66,6 +76,24 @@ public class DBConnection {
 
 		this.initDatabase(mongoDB);
 
+	}
+
+	private String getApplicaitonName() {
+		String kubeLabels = System.getenv("OPENSHIFT_KUBE_PING_LABELS");
+		if (kubeLabels != null) {
+			for (String keyVal : kubeLabels.split(",")) {
+				int delimiterPos = keyVal.indexOf('=');
+				String key = keyVal.substring(0, delimiterPos);
+				String value = keyVal.substring(delimiterPos);
+				
+				if ("application".equals(key)) {
+					return value.toUpperCase() + "_";
+				}
+			}
+			return null; 
+		}
+		
+		return "";
 	}
 
 	public DB getDB() {

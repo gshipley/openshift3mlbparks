@@ -22,6 +22,7 @@ public class Config {
 	@PostConstruct
 	public void init() throws ConfigurationException {
 		config = new PropertiesConfiguration("config.properties");
+		System.out.println("GeoApp configuration initialized.");
 	}
 	
 	public String getDataFile() {
