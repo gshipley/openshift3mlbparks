@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.UnknownHostException;
+import java.util.logging.Logger;
 
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
@@ -21,7 +22,8 @@ import com.mongodb.util.JSON;
 @Named
 @ApplicationScoped
 public class DBConnection {
-
+	private static final Logger LOG = Logger.getLogger(Config.class.getName());
+	
 	public static final String POI_COLLECTION = "poi";
 
 	private DB mongoDB;
@@ -62,16 +64,17 @@ public class DBConnection {
 		
 		Mongo mongo = null;
 		try {
+			LOG.info("Connecting to MongoDB host:" + mongoHost + " port:" + mongoPort);
 			mongo = new Mongo(mongoHost, port);
-			System.out.println("Connected to database");
+			LOG.info("Connected to database");
 		} catch (UnknownHostException e) {
-			System.out.println("Couldn't connect to MongoDB: " + e.getMessage() + " :: " + e.getClass());
+			LOG.info("Couldn't connect to MongoDB: " + e.getMessage() + " :: " + e.getClass());
 		}
 
 		mongoDB = mongo.getDB(mongoDBName);
 
 		if (mongoDB.authenticate(mongoUser, mongoPassword.toCharArray()) == false) {
-			System.out.println("Failed to authenticate DB ");
+			LOG.info("Failed to authenticate DB ");
 		}
 
 		this.initDatabase(mongoDB);
@@ -104,7 +107,7 @@ public class DBConnection {
 		DBCollection parkListCollection = mongoDB.getCollection(POI_COLLECTION);
 		int itemsImported = 0;
 		if (parkListCollection.count() < 1) {
-			System.out.println("The database is empty.  We need to populate it");
+			LOG.info("The database is empty.  We need to populate it");
 			try {
 				String currentLine = new String();
 				URL jsonFile = new URL(config.getDataFile());
@@ -113,7 +116,7 @@ public class DBConnection {
 					parkListCollection.insert((DBObject) JSON.parse(currentLine.toString()));
 					itemsImported++;
 				}
-				System.out.println("Successfully imported " + itemsImported + " items.");
+				LOG.info("Successfully imported " + itemsImported + " items.");
 
 			} catch (Exception e) {
 				e.printStackTrace();

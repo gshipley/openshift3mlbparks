@@ -2,6 +2,7 @@ package org.openshift.geoapp.util;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Logger;
 
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
@@ -19,10 +20,12 @@ public class Config {
 	
 	private PropertiesConfiguration config;
 	
+	private static final Logger LOG = Logger.getLogger(Config.class.getName());
+	
 	@PostConstruct
 	public void init() throws ConfigurationException {
 		config = new PropertiesConfiguration("config.properties");
-		System.out.println("GeoApp configuration initialized.");
+		LOG.info("GeoApp configuration initialized.");
 	}
 	
 	public String getDataFile() {
