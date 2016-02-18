@@ -66,7 +66,7 @@ public class DBConnection {
 
 		Mongo mongo = null;
 		try {
-			LOG.info("Connecting to MongoDB (:" + mongoHost + ":" + mongoPort + ")");
+			LOG.info("Connecting to MongoDB (" + mongoHost + ":" + mongoPort + ")");
 			mongo = new Mongo(mongoHost, port);
 			LOG.info("Connected to database");
 		} catch (UnknownHostException e) {

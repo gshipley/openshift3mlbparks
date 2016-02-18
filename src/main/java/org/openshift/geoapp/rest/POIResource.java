@@ -48,13 +48,15 @@ public class POIResource {
 		for (String field : config.getDataFields()) {
 			info.add(field, dataValue.get(field));
 		}
-		poi.setId(info.render());
+		poi.setInfo(info.render());
 		
 		return poi;
 	}
 
 	private Object getPosition(DBObject dataValue) {
-		if (dataValue.containsField("position")) {
+		if (dataValue.containsField("coordinates")) {
+			return dataValue.get("coordinates");
+		} else if (dataValue.containsField("position")) {
 			return dataValue.get("position");
 		} else if (dataValue.containsField("pos")) {
 			return dataValue.get("pos");
