@@ -1,5 +1,9 @@
 package org.openshift.geoapp.rest;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -22,6 +26,7 @@ import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
+import com.mongodb.util.JSON;
 
 @RequestScoped
 @Path("/poi")
@@ -47,7 +52,7 @@ public class POIResource {
 		poi.setPosition(getPosition(dataValue));
 		
 		Map<String, Object> params = new HashMap<>();
-		for (String field : config.getDataFields()) {
+		for (String field : dataValue.keySet()) {
 			params.put(field, dataValue.get(field));
 		}
 		StrSubstitutor popupTemplate = new StrSubstitutor(params);

@@ -28,4 +28,9 @@ public class POI {
 	public void setInfo(Object info) {
 		this.info = info;
 	}
+
+	@Override
+	public String toString() {
+		return "POI [id=" + id + ", position=" + position + ", info=" + info + "]";
+	}
 }

@@ -32,5 +32,5 @@ $ oc new-app geoapp
 
 ## Application Configuration
 In order to change the dataset displayed on the map, modify _src/main/resources/config.properties_ to point to the JSON file containing the data 
-and update the fields and popup format to match your data.
+and update the popup template to match the JSON fields.
 
