@@ -2,10 +2,10 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.openshift</groupId>
-	<artifactId>mlbparks</artifactId>
+	<artifactId>geo-app</artifactId>
 	<packaging>war</packaging>
-	<version>1.0</version>
-	<name>mlbparks</name>
+	<version>1.0-SNAPSHOT</version>
+	<name>geo-app</name>
 	<repositories>
 		<repository>
 			<id>eap</id>
@@ -59,7 +59,27 @@
 			<artifactId>mongo-java-driver</artifactId>
 			<version>2.9.1</version>
 		</dependency>
+		<dependency>
+			<groupId>commons-configuration</groupId>
+			<artifactId>commons-configuration</artifactId>
+			<version>1.10</version>
+		</dependency>
+		<dependency>
+			<groupId>org.antlr</groupId>
+			<artifactId>stringtemplate</artifactId>
+			<version>4.0.2</version>
+		</dependency>
 	</dependencies>
+	<build>
+		<plugins>
+			<plugin>
+				<artifactId>maven-war-plugin</artifactId>
+				<configuration>
+					<failOnMissingWebXml>false</failOnMissingWebXml>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
 	<profiles>
 		<profile>
 			<!-- When built in OpenShift the 'openshift' profile will be used when 
@@ -71,7 +91,7 @@
 			<!-- http://maven.apache.org/guides/mini/guide-building-for-different-environments.html -->
 			<id>openshift</id>
 			<build>
-				<finalName>mlbparks</finalName>
+				<finalName>geo-app</finalName>
 				<plugins>
 					<plugin>
 						<artifactId>maven-war-plugin</artifactId>

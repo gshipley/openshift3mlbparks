@@ -1,4 +1,4 @@
-package org.openshift.mlbparks.mongo;
+package org.openshift.geoapp.mongo;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -7,7 +7,10 @@ import java.net.UnknownHostException;
 
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
 import javax.inject.Named;
+
+import org.openshift.geoapp.util.Config;
 
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
@@ -19,7 +22,12 @@ import com.mongodb.util.JSON;
 @ApplicationScoped
 public class DBConnection {
 
+	public static final String POI_COLLECTION = "poi";
+
 	private DB mongoDB;
+	
+	@Inject
+	private Config config;
 
 	public DBConnection() {
 		super();
@@ -65,20 +73,19 @@ public class DBConnection {
 	}
 
 	private void initDatabase(DB mongoDB) {
-		DBCollection parkListCollection = mongoDB.getCollection("teams");
-		int teamsImported = 0;
+		DBCollection parkListCollection = mongoDB.getCollection(POI_COLLECTION);
+		int itemsImported = 0;
 		if (parkListCollection.count() < 1) {
 			System.out.println("The database is empty.  We need to populate it");
 			try {
 				String currentLine = new String();
-				URL jsonFile = new URL(
-						"https://raw.githubusercontent.com/gshipley/openshift3mlbparks/master/mlbparks.json");
+				URL jsonFile = new URL(config.getDataFile());
 				BufferedReader in = new BufferedReader(new InputStreamReader(jsonFile.openStream()));
 				while ((currentLine = in.readLine()) != null) {
 					parkListCollection.insert((DBObject) JSON.parse(currentLine.toString()));
-					teamsImported++;
+					itemsImported++;
 				}
-				System.out.println("Successfully imported " + teamsImported + " teams.");
+				System.out.println("Successfully imported " + itemsImported + " items.");
 
 			} catch (Exception e) {
 				e.printStackTrace();

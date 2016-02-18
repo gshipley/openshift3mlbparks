@@ -1,4 +1,4 @@
-package org.openshift.mlbparks.rest;
+package org.openshift.geoapp.rest;
 
 import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.core.Application;
