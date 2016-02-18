@@ -1,9 +1,5 @@
 package org.openshift.geoapp.rest;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -26,7 +22,6 @@ import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
-import com.mongodb.util.JSON;
 
 @RequestScoped
 @Path("/poi")
@@ -49,7 +44,7 @@ public class POIResource {
 		POI poi = new POI();
 
 		poi.setId(dataValue.get("_id"));
-		poi.setPosition(getPosition(dataValue));
+		poi.setPosition(dataValue.get(config.getPositionField()));
 		
 		Map<String, Object> params = new HashMap<>();
 		for (String field : dataValue.keySet()) {
@@ -59,20 +54,6 @@ public class POIResource {
 		poi.setInfo(popupTemplate.replace(config.getPopupTemplate()));
 		
 		return poi;
-	}
-	
-	private Object getPosition(DBObject dataValue) {
-		if (dataValue.containsField("coordinates")) {
-			return dataValue.get("coordinates");
-		} else if (dataValue.containsField("position")) {
-			return dataValue.get("position");
-		} else if (dataValue.containsField("pos")) {
-			return dataValue.get("pos");
-		} else if (dataValue.containsField("location")) {
-			return dataValue.get("location");
-		}
-		
-		return null;
 	}
 
 	// get all the POIs
@@ -114,7 +95,7 @@ public class POIResource {
 		BasicDBObject boxQuery = new BasicDBObject();
 		boxQuery.put("$box", boxList);
 
-		spatialQuery.put("coordinates", new BasicDBObject("$within", boxQuery));
+		spatialQuery.put(config.getPositionField(), new BasicDBObject("$within", boxQuery));
 		System.out.println("Using spatial query: " + spatialQuery.toString());
 
 		DBCursor cursor = poiList.find(spatialQuery);
