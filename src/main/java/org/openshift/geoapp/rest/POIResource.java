@@ -1,7 +1,9 @@
 package org.openshift.geoapp.rest;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
@@ -10,10 +12,10 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 
+import org.apache.commons.lang3.text.StrSubstitutor;
 import org.openshift.geoapp.domain.POI;
 import org.openshift.geoapp.mongo.DBConnection;
 import org.openshift.geoapp.util.Config;
-import org.stringtemplate.v4.ST;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
@@ -44,15 +46,16 @@ public class POIResource {
 		poi.setId(dataValue.get("_id"));
 		poi.setPosition(getPosition(dataValue));
 		
-		ST info = new ST(config.getPopupTemplate(), '{', '}');
+		Map<String, Object> params = new HashMap<>();
 		for (String field : config.getDataFields()) {
-			info.add(field, dataValue.get(field));
+			params.put(field, dataValue.get(field));
 		}
-		poi.setInfo(info.render());
+		StrSubstitutor popupTemplate = new StrSubstitutor(params);
+		poi.setInfo(popupTemplate.replace(config.getPopupTemplate()));
 		
 		return poi;
 	}
-
+	
 	private Object getPosition(DBObject dataValue) {
 		if (dataValue.containsField("coordinates")) {
 			return dataValue.get("coordinates");
