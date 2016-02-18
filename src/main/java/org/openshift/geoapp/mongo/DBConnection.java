@@ -38,10 +38,8 @@ public class DBConnection {
 	@PostConstruct
 	public void afterCreate() {
 		String prefix = getApplicaitonName();
-		String mongoHost = (System.getenv(prefix + "MONGODB_SERVICE_HOST") == null) ? "127.0.0.1"
-				: System.getenv(prefix + "MONGODB_SERVICE_HOST");
-		String mongoPort = (System.getenv(prefix + "MONGODB_SERVICE_PORT") == null) ? "27017"
-				: System.getenv(prefix + "MONGODB_SERVICE_PORT");
+		String mongoHost = System.getenv(prefix + "MONGODB_SERVICE_HOST");
+		String mongoPort = System.getenv(prefix + "MONGODB_SERVICE_PORT");
 		String mongoUser = (System.getenv("DB_USERNAME") == null) ? "geoapp" : System.getenv("DB_USERNAME");
 		String mongoPassword = (System.getenv("DB_PASSWORD") == null) ? "geoapp" : System.getenv("DB_PASSWORD");
 		String mongoDBName = (System.getenv("DB_DATABASE") == null) ? "geoapp" : System.getenv("DB_DATABASE");
@@ -60,6 +58,13 @@ public class DBConnection {
 		}
 		if (mongoPort == null) {
 			mongoPort = System.getenv("MONGODB_24_RHEL7_SERVICE_PORT");
+		}
+		
+		// Default if nothing found
+		if (mongoHost == null || mongoPort == null) {
+			LOG.info("No MongoDB info found. Setting default values");
+			mongoHost = "127.0.0.1";
+			mongoPort = "27017";
 		}
 
 		int port = Integer.decode(mongoPort);

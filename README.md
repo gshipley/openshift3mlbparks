@@ -26,7 +26,8 @@ $ oc scale --replicas=3 rc mlbparks-1
 Load the template with cluster-admin user:
 
 ````
-# oc create -f https://raw.githubusercontent.com/siamaksade/openshift3geoapp/master/geoapp-template.json -n openshift
+$ oc create -f https://raw.githubusercontent.com/siamaksade/openshift3geoapp/master/geoapp-template.json -n openshift
+$ oc new-app geoapp
 ````
 
 ## Application Configuration
