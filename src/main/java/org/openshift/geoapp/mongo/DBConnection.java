@@ -23,11 +23,11 @@ import com.mongodb.util.JSON;
 @ApplicationScoped
 public class DBConnection {
 	private static final Logger LOG = Logger.getLogger(Config.class.getName());
-	
+
 	public static final String POI_COLLECTION = "poi";
 
 	private DB mongoDB;
-	
+
 	@Inject
 	private Config config;
 
@@ -38,33 +38,35 @@ public class DBConnection {
 	@PostConstruct
 	public void afterCreate() {
 		String prefix = getApplicaitonName();
-		String mongoHost = (System.getenv(prefix + "MONGODB_SERVICE_HOST") == null) ? "127.0.0.1" : System.getenv(prefix + "MONGODB_SERVICE_HOST");
-		String mongoPort = (System.getenv(prefix + "MONGODB_SERVICE_PORT") == null) ? "27017" : System.getenv(prefix + "MONGODB_SERVICE_PORT"); 
-		String mongoUser = (System.getenv("DB_USERNAME")== null) ? "geoapp" : System.getenv("DB_USERNAME");
+		String mongoHost = (System.getenv(prefix + "MONGODB_SERVICE_HOST") == null) ? "127.0.0.1"
+				: System.getenv(prefix + "MONGODB_SERVICE_HOST");
+		String mongoPort = (System.getenv(prefix + "MONGODB_SERVICE_PORT") == null) ? "27017"
+				: System.getenv(prefix + "MONGODB_SERVICE_PORT");
+		String mongoUser = (System.getenv("DB_USERNAME") == null) ? "geoapp" : System.getenv("DB_USERNAME");
 		String mongoPassword = (System.getenv("DB_PASSWORD") == null) ? "geoapp" : System.getenv("DB_PASSWORD");
 		String mongoDBName = (System.getenv("DB_DATABASE") == null) ? "geoapp" : System.getenv("DB_DATABASE");
-		
+
 		// Check if mongodb is created separately
 		if (mongoHost == null) {
 			mongoHost = System.getenv("MONGODB_SERVICE_HOST");
-		} 
+		}
 		if (mongoPort == null) {
 			mongoPort = System.getenv("MONGODB_SERVICE_PORT");
 		}
-		
+
 		// Check if we are using a mongoDB template or mongodb RHEL 7 image
 		if (mongoHost == null) {
 			mongoHost = System.getenv("MONGODB_24_RHEL7_SERVICE_HOST");
-		} 
+		}
 		if (mongoPort == null) {
 			mongoPort = System.getenv("MONGODB_24_RHEL7_SERVICE_PORT");
 		}
-		
+
 		int port = Integer.decode(mongoPort);
-		
+
 		Mongo mongo = null;
 		try {
-			LOG.info("Connecting to MongoDB host:" + mongoHost + " port:" + mongoPort);
+			LOG.info("Connecting to MongoDB (:" + mongoHost + ":" + mongoPort + ")");
 			mongo = new Mongo(mongoHost, port);
 			LOG.info("Connected to database");
 		} catch (UnknownHostException e) {
@@ -87,15 +89,15 @@ public class DBConnection {
 			for (String keyVal : kubeLabels.split(",")) {
 				int delimiterPos = keyVal.indexOf('=');
 				String key = keyVal.substring(0, delimiterPos);
-				String value = keyVal.substring(delimiterPos);
-				
+				String value = keyVal.substring(delimiterPos + 1);
+
 				if ("application".equals(key)) {
 					return value.toUpperCase() + "_";
 				}
 			}
-			return null; 
+			return null;
 		}
-		
+
 		return "";
 	}
 
