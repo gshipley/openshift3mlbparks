@@ -18,6 +18,7 @@ import com.mongodb.DBCollection;
 import com.mongodb.DBObject;
 import com.mongodb.Mongo;
 import com.mongodb.util.JSON;
+import com.mongodb.util.JSONParseException;
 
 @Named
 @ApplicationScoped
@@ -120,9 +121,14 @@ public class DBConnection {
 				URL jsonFile = new URL(config.getDataFile());
 				BufferedReader in = new BufferedReader(new InputStreamReader(jsonFile.openStream()));
 				while ((currentLine = in.readLine()) != null) {
-					parkListCollection.insert((DBObject) JSON.parse(currentLine.toString()));
-					itemsImported++;
+					try {
+						parkListCollection.insert((DBObject) JSON.parse(currentLine.toString()));
+						itemsImported++;
+					} catch (JSONParseException ex) {
+						LOG.warning("Failed to parse JSON: " + ex.getMessage());
+					}
 				}
+				
 				LOG.info("Successfully imported " + itemsImported + " items.");
 
 			} catch (Exception e) {
