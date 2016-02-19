@@ -31,7 +31,7 @@
 	
 </head>
 <body>
-	<h1 id="title">MLB Stadiums on OpenShift 3</h1>
+	<h1 id="title">GeoApp on OpenShift 3</h1>
 	<div id="map"></div>
 	<script src="http://cdn.leafletjs.com/leaflet-0.5.1/leaflet.js"></script> 
 	<script>
@@ -48,7 +48,7 @@
 
 		function getPins(e){	
 			bounds = map.getBounds();
-			url = "ws/parks/within?lat1=" + bounds.getNorthEast().lat + "&lon1=" + bounds.getNorthEast().lng + "&lat2=" + bounds.getSouthWest().lat + "&lon2=" + bounds.getSouthWest().lng;
+			url = "ws/poi/within?lat1=" + bounds.getNorthEast().lat + "&lon1=" + bounds.getNorthEast().lng + "&lat2=" + bounds.getSouthWest().lat + "&lon2=" + bounds.getSouthWest().lng;
 			$.get(url, pinTheMap, "json")
 		}
 
@@ -62,16 +62,10 @@
 			var markerArray = new Array(data.length)
 			for (var i = 0; i < data.length; i++){
 				park = data[i];
-				var popupInformation = "<b>" + park.name + "</b></br>" + park.ballpark + "</br>";
-				popupInformation += "<b>Team Payroll: </b>" + park.payroll.toCurrencyString() + "</br>";
-				popupInformation += "<b>League: </b>" + park.league + "</br>";
-				markerArray[i] = L.marker([park.position[1], park.position[0]]).bindPopup(popupInformation);			
+				markerArray[i] = L.marker([park.position[1], park.position[0]]).bindPopup(park.info);			
 			}
-			
     		
 			markerLayerGroup = L.layerGroup(markerArray).addTo(map);	
-
-
 		}
 
 		map.on('dragend', getPins);	
