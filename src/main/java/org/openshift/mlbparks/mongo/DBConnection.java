@@ -72,7 +72,7 @@ public class DBConnection {
 			try {
 				String currentLine = new String();
 				URL jsonFile = new URL(
-						"https://raw.githubusercontent.com/gshipley/openshift3mlbparks/master/mlbparks.json");
+						"https://raw.githubusercontent.com/wssimm/openshift3mlbparks/master/mlbparks.json");
 				BufferedReader in = new BufferedReader(new InputStreamReader(jsonFile.openStream()));
 				while ((currentLine = in.readLine()) != null) {
 					parkListCollection.insert((DBObject) JSON.parse(currentLine.toString()));
