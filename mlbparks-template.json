@@ -278,7 +278,7 @@
             },
             "spec": {
                 "strategy": {
-                    "type": "Recreate",
+                    "type": "Rolling",
                     "resources": {}
                 },
                 "triggers": [
