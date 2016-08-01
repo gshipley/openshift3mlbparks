@@ -52,7 +52,7 @@ public class DBConnection {
 
 		mongoDB = mongo.getDB(mongoDBName);
 
-		if (mongoDB.authenticate(mongoUser, mongoPassword.toCharArray()) == false) {
+		if (mongoDB.authenticate(mongoUser, mongoPassword) == false) {
 			System.out.println("Failed to authenticate DB ");
 			System.out.println("Using username: " + mongoUser + " and password: " + mongoPassword.toCharArray());
 			System.out.println("PW1 " + mongoPassword + " PW2: " + mongoPassword.toCharArray());
