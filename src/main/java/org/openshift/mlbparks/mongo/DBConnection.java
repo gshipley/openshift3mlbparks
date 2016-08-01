@@ -54,6 +54,7 @@ public class DBConnection {
 
 		if (mongoDB.authenticate(mongoUser, mongoPassword.toCharArray()) == false) {
 			System.out.println("Failed to authenticate DB ");
+			System.out.println("Using username: " + mongoUser + " and password: " + mongoPassword.toCharArray());
 		}
 
 		this.initDatabase(mongoDB);
