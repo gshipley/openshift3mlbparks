@@ -1,26 +1,28 @@
 package org.openshift.mlbparks.mongo;
 
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.URL;
-import java.util.Arrays;
+import com.mongodb.MongoClient;
+import com.mongodb.MongoCredential;
+import com.mongodb.ServerAddress;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoDatabase;
+import org.bson.Document;
 
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Named;
-
-import com.mongodb.MongoClient;
-import com.mongodb.client.MongoCollection;
-import com.mongodb.MongoCredential;
-import com.mongodb.ServerAddress;
-import com.mongodb.client.MongoDatabase;
-import org.bson.Document;
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.Arrays;
 
 
 @Named
 @ApplicationScoped
 public class DBConnection {
+
+	private static final String FILENAME = "/parks.json";
+
+	private static final String COLLECTION_NAME = "parks";
 
 	private MongoDatabase mongoDB;
 

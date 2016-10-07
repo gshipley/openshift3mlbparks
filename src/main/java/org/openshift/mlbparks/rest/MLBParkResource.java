@@ -1,7 +1,11 @@
 package org.openshift.mlbparks.rest;
 
-import java.util.ArrayList;
-import java.util.List;
+import com.mongodb.BasicDBObject;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoCursor;
+import org.bson.Document;
+import org.openshift.mlbparks.domain.MLBPark;
+import org.openshift.mlbparks.mongo.DBConnection;
 
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
@@ -9,15 +13,8 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
-
-import org.openshift.mlbparks.domain.MLBPark;
-import org.openshift.mlbparks.mongo.DBConnection;
-
-import com.mongodb.BasicDBObject;
-import com.mongodb.DB;
-import com.mongodb.DBCollection;
-import com.mongodb.DBCursor;
-import com.mongodb.DBObject;
+import java.util.ArrayList;
+import java.util.List;
 
 @RequestScoped
 @Path("/parks")
@@ -26,14 +23,8 @@ public class MLBParkResource {
 	@Inject
 	private DBConnection dbConnection;
 
-	private DBCollection getMLBParksCollection() {
-		DB db = dbConnection.getDB();
-		DBCollection parkListCollection = db.getCollection("teams");
 
-		return parkListCollection;
-	}
-
-	private MLBPark populateParkInformation(DBObject dataValue) {
+	private MLBPark populateParkInformation(Document dataValue) {
 		MLBPark thePark = new MLBPark();
 		thePark.setName(dataValue.get("name"));
 		thePark.setPosition(dataValue.get("coordinates"));
@@ -51,8 +42,8 @@ public class MLBParkResource {
 	public List<MLBPark> getAllParks() {
 		ArrayList<MLBPark> allParksList = new ArrayList<MLBPark>();
 
-		DBCollection mlbParks = this.getMLBParksCollection();
-		DBCursor cursor = mlbParks.find();
+		MongoCollection mlbParks = dbConnection.getCollection();
+		MongoCursor<Document> cursor = mlbParks.find().iterator();
 		try {
 			while (cursor.hasNext()) {
 				allParksList.add(this.populateParkInformation(cursor.next()));
@@ -72,7 +63,7 @@ public class MLBParkResource {
 			@QueryParam("lon2") float lon2) {
 
 		ArrayList<MLBPark> allParksList = new ArrayList<MLBPark>();
-		DBCollection mlbParks = this.getMLBParksCollection();
+		MongoCollection mlbParks =  dbConnection.getCollection();
 
 		// make the query object
 		BasicDBObject spatialQuery = new BasicDBObject();
@@ -87,7 +78,7 @@ public class MLBParkResource {
 		spatialQuery.put("coordinates", new BasicDBObject("$within", boxQuery));
 		System.out.println("Using spatial query: " + spatialQuery.toString());
 
-		DBCursor cursor = mlbParks.find(spatialQuery);
+		MongoCursor<Document> cursor = mlbParks.find(spatialQuery).iterator();
 		try {
 			while (cursor.hasNext()) {
 				allParksList.add(this.populateParkInformation(cursor.next()));
