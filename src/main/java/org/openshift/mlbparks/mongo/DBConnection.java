@@ -1,19 +1,22 @@
 package org.openshift.mlbparks.mongo;
 
 import java.io.BufferedReader;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
-import java.net.UnknownHostException;
+import java.util.Arrays;
 
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Named;
 
-import com.mongodb.DB;
-import com.mongodb.DBCollection;
-import com.mongodb.DBObject;
-import com.mongodb.Mongo;
-import com.mongodb.util.JSON;
+import com.mongodb.MongoClient;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.MongoCredential;
+import com.mongodb.ServerAddress;
+import com.mongodb.client.MongoDatabase;
+import org.bson.Document;
+
 
 @Named
 @ApplicationScoped
@@ -42,21 +45,16 @@ public class DBConnection {
 		
 		int port = Integer.decode(mongoPort);
 		
-		Mongo mongo = null;
+		int port = Integer.decode(mongoPort);
+
 		try {
-			mongo = new Mongo(mongoHost, port);
-			System.out.println("Connected to database");
-		} catch (UnknownHostException e) {
-			System.out.println("Couldn't connect to MongoDB: " + e.getMessage() + " :: " + e.getClass());
+		MongoCredential credential = MongoCredential.createCredential(mongoUser, mongoDBName, mongoPassword.toCharArray());
+		MongoClient mongoClient = new MongoClient(new ServerAddress(mongoHost, Integer.parseInt(mongoPort)), Arrays.asList(credential));
+		mongoDB = mongoClient.getDatabase(mongoDBName);
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
-
-		mongoDB = mongo.getDB(mongoDBName);
-
-		if (mongoDB.authenticate(mongoUser, mongoPassword.toCharArray()) == false) {
-			System.out.println("Failed to authenticate DB ");
-			System.out.println("Using username: " + mongoUser + " and password: " + mongoPassword.toCharArray());
-			System.out.println("PW1 " + mongoPassword + " PW2: " + mongoPassword.toCharArray());
-		}
+		
 
 		this.initDatabase(mongoDB);
 
@@ -66,26 +64,29 @@ public class DBConnection {
 		return mongoDB;
 	}
 
-	private void initDatabase(DB mongoDB) {
-		DBCollection parkListCollection = mongoDB.getCollection("teams");
-		int teamsImported = 0;
+	private void initDatabase(MongoDatabase mongoDB) {
+		MongoCollection parkListCollection = getCollection();
+		int imported = 0;
 		if (parkListCollection.count() < 1) {
 			System.out.println("The database is empty.  We need to populate it");
 			try {
 				String currentLine = new String();
-				URL jsonFile = new URL(
-						"https://raw.githubusercontent.com/gshipley/openshift3mlbparks/master/mlbparks.json");
-				BufferedReader in = new BufferedReader(new InputStreamReader(jsonFile.openStream()));
+				InputStream is = getClass().getClassLoader().getResourceAsStream(FILENAME);
+				BufferedReader in = new BufferedReader(new InputStreamReader(is));
 				while ((currentLine = in.readLine()) != null) {
-					parkListCollection.insert((DBObject) JSON.parse(currentLine.toString()));
-					teamsImported++;
+					parkListCollection.insertOne(Document.parse(currentLine.toString()));
+					imported++;
 				}
-				System.out.println("Successfully imported " + teamsImported + " teams.");
+				System.out.println("Successfully imported " + imported + " elements.");
 
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		}
 	}
+	
+	public void checkDatabase() {
+	    this.initDatabase(mongoDB);
+    }
 
 }
