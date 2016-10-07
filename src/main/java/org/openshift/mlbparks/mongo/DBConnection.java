@@ -22,12 +22,9 @@ import org.bson.Document;
 @ApplicationScoped
 public class DBConnection {
 
-	private DB mongoDB;
+	private MongoDatabase mongoDB;
 
-	public DBConnection() {
-		super();
-	}
-
+	
 	@PostConstruct
 	public void afterCreate() {
 		String mongoHost = (System.getenv("MONGODB_SERVICE_HOST") == null) ? "127.0.0.1" : System.getenv("MONGODB_SERVICE_HOST");
@@ -45,8 +42,6 @@ public class DBConnection {
 		
 		int port = Integer.decode(mongoPort);
 		
-		int port = Integer.decode(mongoPort);
-
 		try {
 		MongoCredential credential = MongoCredential.createCredential(mongoUser, mongoDBName, mongoPassword.toCharArray());
 		MongoClient mongoClient = new MongoClient(new ServerAddress(mongoHost, Integer.parseInt(mongoPort)), Arrays.asList(credential));
@@ -60,8 +55,12 @@ public class DBConnection {
 
 	}
 
-	public DB getDB() {
+	public MongoDatabase getDB() {
 		return mongoDB;
+	}
+
+	public MongoCollection getCollection() {
+		return mongoDB.getCollection(COLLECTION_NAME);
 	}
 
 	private void initDatabase(MongoDatabase mongoDB) {
