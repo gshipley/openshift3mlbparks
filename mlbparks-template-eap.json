@@ -25,7 +25,7 @@
       {
          "description": "Git source URI for application",
          "name": "GIT_URI",
-         "value": "https://github.com/jorgemoralespou/openshift3mlbparks.git"
+         "value": "https://github.com/apetroni/openshift3mlbparks.git"
       },
       {
          "description": "Git branch/tag reference",
