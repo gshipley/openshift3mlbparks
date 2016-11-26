@@ -1,0 +1,100 @@
+apiVersion: v1
+kind: DeploymentConfig
+metadata:
+  creationTimestamp: 2016-11-11T19:58:22Z
+  generation: 3
+  labels:
+    app: mlbparks-wildfly
+    application: mlbparks
+    createdBy: template-mlbparks-wildfly
+    deploymentConfig: mlbparks
+  name: mlbparks
+  namespace: mlb
+  resourceVersion: "62944"
+  selfLink: /oapi/v1/namespaces/mlb/deploymentconfigs/mlbparks
+  uid: 3361d1d5-a849-11e6-9e77-824425931ce8
+spec:
+  replicas: 0
+  selector:
+    deploymentConfig: mlbparks
+  strategy:
+    recreateParams:
+      timeoutSeconds: 600
+    resources: {}
+    type: Recreate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        deploymentConfig: mlbparks
+    spec:
+      containers:
+      - env:
+        - name: MONGODB_USER
+          value: userdkM
+        - name: MONGODB_PASSWORD
+          value: 1hgqJuqr
+        - name: MONGODB_DATABASE
+          value: root
+        - name: MONGODB_ADMIN_PASSWORD
+          value: hs3jrT0X
+        image: 172.30.43.61:5000/mlb/mlbparks@sha256:8202363ae65ad2bce316c6ab478d5c58cee3ee88cbb3d038a5ece0a6d475c6a6
+        imagePullPolicy: Always
+        name: mlbparks
+        ports:
+        - containerPort: 8080
+          name: mlbparks-http
+          protocol: TCP
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /
+            port: 8080
+            scheme: HTTP
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 1
+        resources: {}
+        securityContext:
+          capabilities: {}
+          privileged: false
+        terminationMessagePath: /dev/termination-log
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+  test: false
+  triggers:
+  - imageChangeParams:
+      automatic: true
+      containerNames:
+      - mlbparks
+      from:
+        kind: ImageStreamTag
+        name: mlbparks:latest
+        namespace: mlb
+      lastTriggeredImage: 172.30.43.61:5000/mlb/mlbparks@sha256:8202363ae65ad2bce316c6ab478d5c58cee3ee88cbb3d038a5ece0a6d475c6a6
+    type: ImageChange
+  - type: ConfigChange
+status:
+  conditions:
+  - lastTransitionTime: 2016-11-14T03:51:46Z
+    message: Replication controller "mlbparks-1" has completed progressing
+    reason: NewReplicationControllerAvailable
+    status: "True"
+    type: Progressing
+  - lastTransitionTime: 2016-11-15T19:24:16Z
+    message: Deployment config does not have minimum availability.
+    status: "False"
+    type: Available
+  details:
+    causes:
+    - imageTrigger:
+        from:
+          kind: ImageStreamTag
+          name: mlbparks:latest
+          namespace: mlb
+      type: ImageChange
+    message: caused by an image change
+  latestVersion: 1
+  observedGeneration: 3

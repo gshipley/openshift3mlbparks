@@ -1,0 +1,47 @@
+apiVersion: v1
+kind: BuildConfig
+metadata:
+  annotations:
+    openshift.io/generated-by: OpenShiftNewBuild
+  creationTimestamp: 2016-11-26T10:11:55Z
+  labels:
+    build: openshift3mlbparks
+  name: openshift3mlbparks
+  namespace: test
+  resourceVersion: "220558"
+  selfLink: /oapi/v1/namespaces/test/buildconfigs/openshift3mlbparks
+  uid: c26368fa-b3c0-11e6-b515-6606fe7c60df
+spec:
+  nodeSelector: null
+  output:
+    to:
+      kind: ImageStreamTag
+      name: openshift3mlbparks:latest
+  postCommit: {}
+  resources: {}
+  runPolicy: Serial
+  source:
+    git:
+      ref: master
+      uri: https://github.com/apetroni/openshift3mlbparks.git
+    type: Git
+  strategy:
+    sourceStrategy:
+      from:
+        kind: ImageStreamTag
+        name: wildfly:latest
+        namespace: openshift
+    type: Source
+  triggers:
+  - github:
+      secret: CQEtcsnRAs9sSsZhngKJ
+    type: GitHub
+  - generic:
+      secret: Qn7S7iCEpHisuK8xKvnr
+    type: Generic
+  - type: ConfigChange
+  - imageChange:
+      lastTriggeredImageID: openshift/wildfly-100-centos7@sha256:6a059132fa41743b6aa536b7b19bc152fdf7954e4574fcbdeb60afb5edf2e44b
+    type: ImageChange
+status:
+  lastVersion: 1
