@@ -63,7 +63,7 @@
 			for (var i = 0; i < data.length; i++){
 				park = data[i];
 				var popupInformation = "<b>" + park.name + "</b></br>" + park.ballpark + "</br>";
-				popupInformation += "<b>Team Payroll: </b>" + park.payroll.toCurrencyString() + "</br>";
+				popupInformation += "<b>Team OKsystem Payroll: </b>" + park.payroll.toCurrencyString() + "</br>";
 				popupInformation += "<b>League: </b>" + park.league + "</br>";
 				markerArray[i] = L.marker([park.position[1], park.position[0]]).bindPopup(popupInformation);			
 			}
