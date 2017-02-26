@@ -1,0 +1,48 @@
+apiVersion: v1
+kind: BuildConfig
+metadata:
+  creationTimestamp: 2016-11-11T17:42:16Z
+  labels:
+    app: mlbparks-wildfly
+    application: mlbparks
+    createdBy: template-mlbparks-wildfly
+  name: mlbparks
+  namespace: alexproj
+  resourceVersion: "21257"
+  selfLink: /oapi/v1/namespaces/alexproj/buildconfigs/mlbparks
+  uid: 2fa0c5e8-a836-11e6-9e77-824425931ce8
+spec:
+  nodeSelector: null
+  output:
+    to:
+      kind: ImageStreamTag
+      name: mlbparks:latest
+  postCommit: {}
+  resources: {}
+  runPolicy: Serial
+  source:
+    git:
+      ref: master
+      uri: https://github.com/jorgemoralespou/openshift3mlbparks.git
+    type: Git
+  strategy:
+    sourceStrategy:
+      env:
+      - name: MAVEN_MIRROR_URL
+      from:
+        kind: ImageStreamTag
+        name: wildfly:latest
+        namespace: openshift
+    type: Source
+  triggers:
+  - generic:
+      secret: IKEX6h3L
+    type: Generic
+  - github:
+      secret: H8NQ8oh6
+    type: GitHub
+  - imageChange:
+      lastTriggeredImageID: openshift/wildfly-100-centos7@sha256:6a059132fa41743b6aa536b7b19bc152fdf7954e4574fcbdeb60afb5edf2e44b
+    type: ImageChange
+status:
+  lastVersion: 1

@@ -1,0 +1,33 @@
+kind: "DeploymentConfig"
+apiVersion: "v1"
+metadata:
+  name: "mlbparks"
+spec:
+  template: 
+    metadata:
+      labels:
+        name: "mlbparks"
+    spec:
+      containers:
+        - name: "mlbparks"
+          image: "172.30.43.61:5000/test/openshift3mlbpark"
+          ports:
+            - containerPort: 8080
+              protocol: "TCP"
+  replicas: 1 
+  selector:
+    name: "mlbparks"
+  triggers:
+#    - type: "ConfigChange" 
+    - type: "ImageChange" 
+      imageChangeParams:
+        automatic: true
+        containerNames:
+          - "mlbparks"
+        from:
+          kind: "ImageStreamTag"
+          name: "172.30.43.61:5000/test/openshift3mlbpark"
+  strategy: 
+    type: "Rolling"
+
+
