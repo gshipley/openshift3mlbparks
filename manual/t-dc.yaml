@@ -1,0 +1,66 @@
+apiVersion: v1
+kind: DeploymentConfig
+metadata:
+  creationTimestamp: 2016-11-26T12:47:50Z
+  generation: 4
+  name: mlbparks
+  namespace: test
+  resourceVersion: "225474"
+  selfLink: /oapi/v1/namespaces/test/deploymentconfigs/mlbparks
+  uid: 8a7b34e7-b3d6-11e6-b515-6606fe7c60df
+spec:
+  replicas: 1
+  selector:
+    name: mlbparks
+  strategy:
+    resources: {}
+    rollingParams:
+      intervalSeconds: 1
+      maxSurge: 25%
+      maxUnavailable: 25%
+      timeoutSeconds: 600
+      updatePeriodSeconds: 1
+    type: Rolling
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        name: mlbparks
+    spec:
+      containers:
+      - image: 172.30.43.61:5000/test/openshift3mlbpark
+        imagePullPolicy: Always
+        name: mlbparks
+        ports:
+        - containerPort: 8080
+          protocol: TCP
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+  test: false
+  triggers:
+  - imageChangeParams:
+      automatic: true
+      containerNames:
+      - mlbparks
+      from:
+        kind: ImageStreamTag
+        name: 172.30.43.61:5000/test/openshift3mlbpark
+        namespace: test
+    type: ImageChange
+status:
+  conditions:
+  - lastTransitionTime: 2016-11-26T12:47:50Z
+    message: Deployment config does not have minimum availability.
+    status: "False"
+    type: Available
+  - lastTransitionTime: 2016-11-26T13:04:09Z
+    message: Replication controller "mlbparks-1" has failed progressing
+    reason: ProgressDeadlineExceeded
+    status: "False"
+    type: Progressing
+  latestVersion: 1
+  observedGeneration: 4

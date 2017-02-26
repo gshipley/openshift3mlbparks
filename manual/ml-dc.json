@@ -1,0 +1,94 @@
+{
+    "apiVersion": "v1",
+    "kind": "DeploymentConfig",
+    "metadata": {
+        "labels": {
+            "application": "mlbparks",
+            "createdBy": "alex",
+            "deploymentConfig": "mlbparks"
+        },
+        "name": "mlbparks"
+    },
+    "spec": {
+        "replicas": 1,
+        "selector": {
+            "deploymentConfig": "mlbparks"
+        },
+        "strategy": {
+            "type": "Recreate"
+        },
+        "template": {
+            "metadata": {
+                "labels": {
+                    "deploymentConfig": "mlbparks"
+                }
+            },
+            "spec": {
+                "containers": [
+                    {
+                        "env": [
+                            {
+                                "name": "MONGODB_USER",
+                                "value": "userr2g"
+                            },
+                            {
+                                "name": "MONGODB_PASSWORD",
+                                "value": "wecl3ATW"
+                            },
+                            {
+                                "name": "MONGODB_DATABASE",
+                                "value": "root"
+                            },
+                            {
+                                "name": "MONGODB_ADMIN_PASSWORD",
+                                "value": "6b5Y2nSL"
+                            }
+                        ],
+                        "image": "mlbparks",
+                        "imagePullPolicy": "Always",
+                        "name": "mlbparks",
+                        "ports": [
+                            {
+                                "containerPort": 8080,
+                                "name": "mlbparks-http",
+                                "protocol": "TCP"
+                            }
+                        ],
+                        "readinessProbe": {
+                            "httpGet": {
+                                "path": "/",
+                                "port": 8080
+                            }
+                        },
+                        "resources": {},
+                        "securityContext": {
+                            "capabilities": {},
+                            "privileged": false
+                        },
+                        "terminationMessagePath": "/dev/termination-log"
+                    }
+                ],
+                "dnsPolicy": "ClusterFirst",
+                "restartPolicy": "Always"
+            }
+        },
+        "triggers": [
+            {
+                "imageChangeParams": {
+                    "automatic": true,
+                    "containerNames": [
+                        "mlbparks"
+                    ],
+                    "from": {
+                        "kind": "ImageStreamTag",
+                        "name": "mlbparks:latest"
+                    }
+                },
+                "type": "ImageChange"
+            },
+            {
+                "type": "ConfigChange"
+            }
+        ]
+    }
+        }

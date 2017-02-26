@@ -1,0 +1,62 @@
+apiVersion: v1
+kind: DeploymentConfig
+metadata:
+  creationTimestamp: 2016-11-26T13:43:36Z
+  generation: 2
+  name: dc5
+  namespace: test
+  resourceVersion: "226786"
+  selfLink: /oapi/v1/namespaces/test/deploymentconfigs/dc5
+  uid: 54cf8582-b3de-11e6-b515-6606fe7c60df
+spec:
+  replicas: 1
+  selector:
+    deployment-config.name: dc5
+  strategy:
+    resources: {}
+    rollingParams:
+      intervalSeconds: 1
+      maxSurge: 25%
+      maxUnavailable: 25%
+      timeoutSeconds: 600
+      updatePeriodSeconds: 1
+    type: Rolling
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        deployment-config.name: dc5
+    spec:
+      containers:
+      - image: 172.30.43.61:5000/test/openshift3mlbparks@sha256:f96202c58b20cab4bd9078e4a003eda4461759c698bababa3d2a20cf84b1160e
+        imagePullPolicy: IfNotPresent
+        name: default-container
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+  test: false
+  triggers:
+  - type: ConfigChange
+status:
+  availableReplicas: 1
+  conditions:
+  - lastTransitionTime: 2016-11-26T13:43:40Z
+    message: Deployment config has minimum availability.
+    status: "True"
+    type: Available
+  - lastTransitionTime: 2016-11-26T13:43:42Z
+    message: Replication controller "dc5-1" has completed progressing
+    reason: NewReplicationControllerAvailable
+    status: "True"
+    type: Progressing
+  details:
+    causes:
+    - type: ConfigChange
+    message: config change
+  latestVersion: 1
+  observedGeneration: 2
+  replicas: 1
+  updatedReplicas: 1
