@@ -34,22 +34,15 @@ public class DBConnection {
 		String mongoUser = (System.getenv("MONGODB_USER")== null) ? "mlbparks" : System.getenv("MONGODB_USER");
 		String mongoPassword = (System.getenv("MONGODB_PASSWORD") == null) ? "mlbparks" : System.getenv("MONGODB_PASSWORD");
 		String mongoDBName = (System.getenv("MONGODB_DATABASE") == null) ? "mlbparks" : System.getenv("MONGODB_DATABASE");
-		// Check if we are using a mongoDB template or mongodb RHEL 7 image
-		if (mongoHost == null) {
-			mongoHost = System.getenv("MONGODB_24_RHEL7_SERVICE_HOST");
-		} 
-		if (mongoPort == null) {
-			mongoPort = System.getenv("MONGODB_24_RHEL7_SERVICE_PORT");
-		}
 		
 		int port = Integer.decode(mongoPort);
 		
 		try {
-		MongoCredential credential = MongoCredential.createCredential(mongoUser, mongoDBName, mongoPassword.toCharArray());
-		MongoClient mongoClient = new MongoClient(new ServerAddress(mongoHost, Integer.parseInt(mongoPort)), Arrays.asList(credential));
-		mongoDB = mongoClient.getDatabase(mongoDBName);
+		    MongoCredential credential = MongoCredential.createCredential(mongoUser, mongoDBName, mongoPassword.toCharArray());
+		    MongoClient mongoClient = new MongoClient(new ServerAddress(mongoHost, Integer.parseInt(mongoPort)), Arrays.asList(credential));
+		    mongoDB = mongoClient.getDatabase(mongoDBName);
 		} catch (Exception e) {
-			e.printStackTrace();
+		    e.printStackTrace();
 		}
 		
 
