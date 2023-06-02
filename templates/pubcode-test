@@ -1,0 +1,31 @@
+---
+data_management_roles:
+  data_custodian: TBD
+  product_owner: Pete Tollestrup
+product_external_dependencies:
+  notification_standard: []
+product_information:
+  api_specifications: []
+  ministry:
+    - Water, Land and Resource Stewardship
+  product_acronym: FAM
+  product_description: >-
+    The Forest Access Management (FAM) is a foundational product for other FSA
+    apps. FAM will provide the opportunity for government staff  and external
+    stakeholders to provision access to forestry suite of applications. FAM is
+    being hosted on the AWS cloud in the Canada  Region and is managed by the
+    SSO Cloud Pathfinder team.  FAM uses an Open ID Connect (OIDC) standard for
+    safe and transparent  authentication. The purpose of this initiative is to
+    provide a system where access privileges can be assigned to internal and
+    external users of Forestry Suites of Application (FSA) systems.
+  product_name: Forest Access Management
+  product_status: active
+  product_urls: []
+  program_area: FSA
+product_technology_information:
+  backend_frameworks: []
+  backend_languages_version: []
+  frontend_languages: []
+  hosting_platforms:
+    - Amazon-Web-Services
+version: 1
